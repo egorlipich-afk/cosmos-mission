@@ -2,956 +2,706 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>♾️ КОСМО-ЦИКЛ: Миссия «Условие» · Информатика 8 класс</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Пульт управления · Древний цифровой архив</title>
     <style>
         * {
-            box-sizing: border-box;
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: 'Segoe UI', 'Roboto', system-ui, sans-serif;
-            background: radial-gradient(circle at 30% 20%, #0a1622, #02060b);
             min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #010a15, #000000);
+            font-family: 'Share Tech Mono', 'Fira Code', 'Courier New', monospace;
             display: flex;
-            align-items: center;
             justify-content: center;
-            padding: 12px;
-            margin: 0;
-            color: #e2ecfe;
+            align-items: center;
+            padding: 20px;
+            position: relative;
         }
 
-        .game-container {
-            max-width: 1150px;
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            background: rgba(6, 22, 45, 0.8);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border: 2px solid #2d6eb0;
-            border-radius: 52px;
-            padding: 20px 18px 28px;
-            box-shadow: 0 20px 40px #00000080, 0 0 35px #2a7fd4;
-            transition: all 0.2s;
+            height: 100%;
+            background: linear-gradient(125deg, #001220, #001a2f, #002a44, #001a2f, #001220);
+            background-size: 400% 400%;
+            animation: fluidGradient 16s ease infinite;
+            z-index: -2;
         }
 
-        h1, h2, h3 {
-            font-weight: 600;
-            letter-spacing: 0.3px;
-            text-shadow: 0 5px 12px #0f2f55;
+        @keyframes fluidGradient {
+            0% { background-position: 0% 50%;}
+            50% { background-position: 100% 50%;}
+            100% { background-position: 0% 50%;}
         }
 
-        h1 {
-            font-size: clamp(1.8rem, 7vw, 2.6rem);
+        .console {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.94);
+            backdrop-filter: blur(12px);
+            border-radius: 48px;
+            border: 2px solid #2ef0ff;
+            box-shadow: 0 0 30px rgba(46, 240, 255, 0.5);
+            padding: 24px 28px 32px;
+        }
+
+        .glow-title {
+            font-size: clamp(1.6rem, 8vw, 2.8rem);
             text-align: center;
-            margin: 0 0 10px;
-            background: linear-gradient(145deg, #c6e2ff, #8bb9ff);
+            font-weight: 800;
+            letter-spacing: 3px;
+            background: linear-gradient(135deg, #ffffff, #a0e0ff, #4effff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
         }
 
-        .progress-area {
+        .status-panel {
+            background: #03151fcc;
+            border-radius: 80px;
+            padding: 6px 24px;
+            margin: 12px auto 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border: 1px solid #0ff8;
+        }
+
+        .led-indicator {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            background: #0e1e30dd;
-            border-radius: 50px;
-            padding: 8px 18px;
-            margin: 8px 0 22px;
-            border: 1px solid #2f71b0;
-            backdrop-filter: blur(4px);
+            gap: 8px;
+            background: #00000099;
+            padding: 6px 16px;
+            border-radius: 40px;
+            color: white;
+            font-weight: bold;
         }
 
-        .progress-text {
+        .led {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2effb0;
+            box-shadow: 0 0 8px #0f0;
+            transition: 0.07s linear;
+        }
+        .led.red-glow { background: #ff3366; box-shadow: 0 0 18px #ff1133; }
+        .led.green-glow { background: #2effb0; box-shadow: 0 0 18px #00ff88; }
+
+        .score-card {
+            background: #010d17dd;
+            padding: 6px 18px;
+            border-radius: 32px;
             font-weight: bold;
             font-size: 1.2rem;
-            color: #c3dcff;
+            color: white;
         }
 
-        .progress-bar-bg {
-            flex: 1;
-            height: 16px;
-            background: #14283e;
-            border-radius: 30px;
-            margin: 0 18px;
-            overflow: hidden;
-            box-shadow: inset 0 3px 8px #00000066;
-        }
+        .screen { display: none; }
+        .screen.active { display: block; animation: fadeIn 0.25s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, #2cd49c, #3098f0);
-            border-radius: 30px;
-            box-shadow: 0 0 15px #2ad49c;
-            transition: width 0.45s ease;
-        }
-
-        .screen {
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .screen.active {
-            display: block;
-            opacity: 1;
-        }
-
-        .start-screen {
+        .start-card {
+            background: #021826ee;
+            border-radius: 40px;
+            padding: 34px 26px;
+            margin: 20px 0;
+            border: 2px solid #2bc8ff;
             text-align: center;
         }
-
-        .story-card {
-            background: #0d2644dd;
-            border-radius: 48px;
-            padding: 26px 22px;
-            margin: 20px 0;
-            border-left: 10px solid #48b5ff;
-            text-align: left;
-            backdrop-filter: blur(5px);
-        }
-
-        .rule-list {
-            list-style: none;
-            margin-top: 18px;
-        }
-
-        .rule-list li {
-            padding: 10px 0 10px 34px;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"><path fill="%2348b5ff" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>') left center no-repeat;
-            background-size: 22px;
-            font-size: 1.05rem;
+        .start-card p {
+            font-size: 1.6rem;
+            line-height: 1.5;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 0 4px #00aaff;
         }
 
         .btn {
-            background: linear-gradient(150deg, #1e5fa5, #0e2d5a);
-            border: none;
-            border-radius: 80px;
-            padding: 18px 36px;
-            font-size: 1.5rem;
+            background: linear-gradient(145deg, #0e476b, #022c44);
+            border: 1px solid #2ef0ff;
+            font-size: 1.3rem;
             font-weight: bold;
+            padding: 14px 28px;
+            border-radius: 60px;
             color: white;
-            text-shadow: 0 2px 5px black;
-            box-shadow: 0 10px 0 #091a2b, 0 5px 20px #0088ff;
             cursor: pointer;
-            border: 1px solid #74b0ff;
-            transition: all 0.08s;
-            margin: 20px 0 10px;
-            min-width: 240px;
+            transition: 0.08s linear;
+            box-shadow: 0 6px 0 #001a2a;
+            font-family: monospace;
+        }
+        .btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #001a2a; }
+        .btn-small { font-size: 1rem; padding: 10px 20px; }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+        .task-console {
+            background: #02111dee;
+            border-radius: 36px;
+            padding: 22px;
+            margin: 15px 0;
+            border: 1px solid #3effdd;
         }
 
-        .btn:active {
-            transform: translateY(6px);
-            box-shadow: 0 4px 0 #091a2b, 0 8px 18px #0088ff;
+        .code-block {
+            background: #030e17;
+            padding: 18px;
+            border-radius: 28px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 1rem;
+            color: #d6ffec;
+            border-left: 8px solid #2effb0;
+            margin: 18px 0;
+            white-space: pre-wrap;
         }
 
-        .btn:disabled {
-            opacity: 0.5;
-            transform: none;
-            pointer-events: none;
-            filter: grayscale(0.6);
+        .code-input {
+            background: #0a1c28;
+            border: 2px solid #3aa8ff;
+            padding: 14px;
+            border-radius: 28px;
+            width: 100%;
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            color: white;
+            line-height: 1.5;
         }
 
-        .small-btn {
-            font-size: 1.2rem;
-            padding: 12px 24px;
-            min-width: 160px;
-        }
-
-        .gameplay-screen {
-            padding: 5px;
-        }
-
-        .task-header {
+        .matching-grid {
             display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            margin-bottom: 12px;
+            gap: 30px;
             flex-wrap: wrap;
-        }
-
-        .mnemo-badge {
-            background: #2d2150cc;
-            padding: 8px 22px;
-            border-radius: 40px;
-            font-style: italic;
-            border: 1px dashed #b6a2ff;
-            font-size: 0.95rem;
-            backdrop-filter: blur(4px);
-        }
-
-        .play-area {
-            background: #071b30b3;
-            border-radius: 44px;
-            padding: 20px 16px;
-            backdrop-filter: blur(5px);
-            border: 1px solid #3873bb;
-        }
-
-        .drag-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
             justify-content: center;
             margin: 20px 0;
         }
-
-        .draggable {
-            background: #1d4470;
-            padding: 14px 22px;
-            border-radius: 60px;
-            font-weight: bold;
-            box-shadow: 0 7px 0 #0c1d2f;
-            border: 1px solid #86b6ff;
-            cursor: grab;
-            user-select: none;
-            transition: 0.1s;
-            color: #f3f9ff;
-            font-size: 1.1rem;
-            text-align: center;
+        .code-items, .definition-items {
+            flex: 1;
+            min-width: 280px;
+            background: #031a26a0;
+            border-radius: 32px;
+            padding: 20px;
         }
-
-        .draggable:active {
-            cursor: grabbing;
-            opacity: 0.75;
-        }
-
-        .dropzones {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            justify-content: space-around;
-        }
-
-        .dropzone {
-            background: #0b213ac0;
-            border: 3px dashed #3377bb;
-            border-radius: 35px;
-            padding: 18px 10px;
-            min-width: 200px;
-            flex: 1 1 200px;
-            text-align: center;
-            transition: background 0.2s, border 0.2s;
-            color: #d0e4ff;
-        }
-
-        .dropzone.active-drop {
-            border-color: #5ef0aa;
-            background: #1a5a45c0;
-            box-shadow: 0 0 22px #3effb2;
-        }
-
-        .dropped-items {
-            min-height: 45px;
-            margin-top: 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-
-        .dropped-item {
-            background: #1d5a5a;
-            padding: 10px 12px;
-            border-radius: 40px;
-            font-size: 1rem;
-            border: 1px solid #5ef0aa;
-            cursor: grab;
-            transition: 0.1s;
-            text-align: center;
-        }
-
-        .dropped-item:active {
-            cursor: grabbing;
-            opacity: 0.8;
-        }
-
-        .sequence-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 28px 0;
-            justify-content: center;
-        }
-
-        .seq-slot {
-            width: 100px;
-            min-height: 100px;
-            background: #102a41;
-            border: 3px solid #3e82cf;
-            border-radius: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            color: #c3ddff;
-            box-shadow: inset 0 0 15px #00000077;
-            font-size: 0.95rem;
-            text-align: center;
-            padding: 8px;
+        .code-item, .def-item {
+            background: #0e4b6e;
+            margin: 12px 0;
+            padding: 14px 18px;
+            border-radius: 28px;
             cursor: pointer;
+            border: 2px solid #3aa8ff;
             transition: 0.1s;
-            word-break: break-word;
+            font-weight: bold;
+            font-family: monospace;
+            white-space: pre-wrap;
         }
-
-        .seq-slot.filled {
-            background: #1e5b92;
-            border-color: #a3d1ff;
-        }
-
-        .seq-slot:hover {
-            background: #1e4d7a;
-        }
-
-        .choice-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            justify-content: center;
-        }
-
-        .choice-btn {
-            background: #153a5e;
-            padding: 14px 20px;
-            border-radius: 50px;
-            border: 2px solid #4c8ac9;
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.1s;
-            color: #ebf3ff;
-            font-size: 1rem;
-            user-select: none;
-            text-align: center;
-            flex: 0 1 auto;
-        }
-
-        .choice-btn.selected {
-            background: #219b6b;
-            border-color: #b4ffda;
-            box-shadow: 0 0 18px #19e68c;
-            opacity: 0.8;
+        .code-item.dragging, .def-item.dragging { opacity: 0.4; }
+        .code-item.matched, .def-item.matched { 
+            background: #1c5a3a; 
+            border-color: #2effb0;
+            text-decoration: line-through;
+            opacity: 0.6;
             cursor: default;
+            pointer-events: none;
         }
-
+        .code-item:hover:not(.matched), .def-item:hover:not(.matched) { background: #1a6d9e; transform: scale(1.01); }
+        
+        .drag-group { display: flex; flex-wrap: wrap; gap: 15px; margin: 20px 0; justify-content: center; }
+        .drag-item { background: #0e4b6e; padding: 12px 20px; border-radius: 40px; font-weight: bold; cursor: grab; border: 1px solid cyan; }
+        .drop-zone { background: #0a2a3b; border: 2px dashed #4effd0; border-radius: 32px; padding: 15px; min-width: 220px; text-align: center; }
+        
         .feedback {
-            min-height: 80px;
-            margin: 20px 0 10px;
-            padding: 16px 22px;
-            border-radius: 40px;
-            background: #10273fc0;
-            font-size: 1.15rem;
-            border-left: 6px solid #ffd966;
-            backdrop-filter: blur(4px);
-            line-height: 1.4;
+            background: #031d2edd;
+            border-radius: 28px;
+            padding: 14px 20px;
+            margin: 16px 0;
+            border-left: 10px solid #ffcc44;
+            font-weight: bold;
+            color: #ffffdd;
         }
-
-        .next-area {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .reset-task-btn {
-            background: #3a2a5e;
-            box-shadow: 0 6px 0 #1e1633;
-            font-size: 1rem;
-            padding: 10px 20px;
-            min-width: auto;
-        }
-
-        .final-screen {
-            text-align: center;
-        }
-
-        .congrats {
-            font-size: 2rem;
-            margin: 30px 0;
-        }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        @media (max-width: 600px) {
-            .game-container { padding: 16px 10px; }
-            .btn { font-size: 1.3rem; padding: 14px 22px; }
-            .seq-slot { width: 80px; min-height: 80px; font-size: 0.85rem; }
-        }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+        .progress-bar-bg { background: #081e2c; border-radius: 30px; height: 14px; overflow: hidden; flex: 2; }
+        .progress-fill { width: 0%; height: 100%; background: linear-gradient(90deg, #0ff, #2effaa); transition: width 0.4s; }
+        footer { text-align: center; font-size: 0.75rem; margin-top: 20px; opacity: 0.8; color: #ccf4ff; }
+        h2, h3, span, label, p, div { color: white; }
+        #taskTitleDynamic { color: #eaffff; text-shadow: 0 0 4px cyan; }
+        textarea.code-input { font-family: 'Fira Code', monospace; resize: vertical; line-height: 1.5; }
     </style>
 </head>
 <body>
-<div class="game-container">
-    <h1>🛸 ЦИКЛ С УСЛОВИЕМ: СПАСЕНИЕ ОРБИТАЛЬНОЙ СТАНЦИИ</h1>
-
-    <div class="progress-area">
-        <span class="progress-text">🔰 Прогресс миссии</span>
-        <div class="progress-bar-bg"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
-        <span id="progressFraction" class="progress-text">0/7</span>
+<div class="console">
+    <div class="glow-title" id="mainTitle">ДРЕВНИЙ ЦИФРОВОЙ АРХИВ</div>
+    <div class="status-panel">
+        <div class="led-indicator"><span>🟢 СИСТЕМА</span><div class="led" id="sysLed"></div></div>
+        <div class="score-card" id="scoreBoardDisplay">🔐 АВТОРИЗАЦИЯ</div>
     </div>
 
-    <!-- СТАРТОВЫЙ ЭКРАН -->
-    <div id="startScreen" class="screen start-screen active">
-        <div class="story-card">
-            <h2>📡 Сюжет: петля времени на станции «Алгоритм»</h2>
-            <p style="margin: 12px 0; line-height: 1.5;">Ты — капитан исследовательского корабля «Алгоритм». Энергетический щит повреждён, и станция застряла во <strong>временной петле</strong>. Чтобы вырваться, необходимо восстановить алгоритмы циклов с условием: <strong>цикл с предусловием (while)</strong>, <strong>цикл с постусловием</strong> и <strong>тело цикла</strong>. Используй логику из учебника информатики 8 класса (параграф 2.4.3, страницы 81-91).</p>
-            <ul class="rule-list">
-                <li><strong>🔄 Цикл с предусловием (цикл-ПОКА, while)</strong> — сначала проверяется условие, затем выполняется тело цикла (страницы 10-13)</li>
-                <li><strong>🔁 Цикл с постусловием</strong> — сначала выполняется тело цикла, потом проверяется условие окончания (страница 15, пример с четверостишием)</li>
-                <li><strong>⚙️ Тело цикла</strong> — последовательность действий, многократно повторяющаяся в процессе выполнения цикла (страницы 2-5)</li>
-                <li><strong>⛔ Зацикливание и выход из цикла</strong> — условие продолжения должно изменяться внутри тела, иначе цикл станет бесконечным</li>
-                <li>📘 Мнемоническая история: спортсмен увеличивает дистанцию пробега на 10 процентов каждый день, пока не достигнет 25 километров (страница 17), и робот-художник, рисующий фигуры заданное количество раз</li>
-            </ul>
+    <div id="startScreen" class="screen active">
+        <div class="start-card">
+            <p>📡 Вас приветствует древнейшая и мощьнейшая система всего интернета.<br><br>
+            Хотите получить ключ доступа и пароль к системе — выполните задания для верификации.<br><br>
+            Спасибо за использование!</p>
         </div>
-        <button class="btn" id="startBtn">🚀 НАЧАТЬ МИССИЮ ПО СПАСЕНИЮ</button>
-        <p style="margin-top:15px; opacity:0.9;">⚡ Игровые механики: перетаскивание элементов, сопоставление категорий, восстановление последовательности · 7 интерактивных заданий</p>
+        <div style="text-align:center;"><button class="btn" id="startMissionBtn">🚀 ЗАПУСТИТЬ ВЕРИФИКАЦИЮ</button></div>
     </div>
 
-    <!-- ИГРОВОЙ ЭКРАН -->
-    <div id="gameScreen" class="screen gameplay-screen">
-        <div class="task-header">
-            <h2 id="taskTitle">Задание 1</h2>
-            <span class="mnemo-badge" id="mnemoHint">🧠 Мнемоническая подсказка</span>
+    <div id="gameScreen" class="screen">
+        <div class="flex-between">
+            <h2 style="color:#8cf0ff;">🔄 ПРОЦЕСС ВЕРИФИКАЦИИ</h2>
+            <div class="score-card">✅ ПРАВИЛЬНО: <span id="correctCount">0</span> / <span id="totalTasksSpan">10</span></div>
         </div>
-        <div class="play-area" id="playArea"></div>
-        <div class="feedback" id="feedbackMsg">✨ Выполни задание, капитан! Перетаскивай блоки с вариантами ответов, кликай для построения последовательности.</div>
-        <div class="next-area">
-            <button class="btn small-btn reset-task-btn" id="resetTaskBtn">🔄 Сбросить текущее задание</button>
-            <button class="btn small-btn" id="nextTaskBtn" disabled>▶ ПЕРЕЙТИ К СЛЕДУЮЩЕМУ ЗАДАНИЮ</button>
+        <div class="flex-between" style="margin:12px 0">
+            <span id="taskNumberLabel" style="background:#01161f; padding:4px 16px; border-radius:28px;">ЗАДАНИЕ 1/10</span>
+            <div class="progress-bar-bg"><div class="progress-fill" id="progressFillGame"></div></div>
+        </div>
+        <div id="taskTitleDynamic" style="font-size:1.8rem; font-weight:bold; margin:10px 0;">Загрузка...</div>
+        <div class="task-console" id="taskContentArea"></div>
+        <div class="feedback" id="globalFeedbackMessage">⚡ Выполните задание. Пульт отслеживает точность.</div>
+        <div class="flex-between">
+            <button class="btn btn-small" id="resetTaskBtn">⟳ СБРОСИТЬ ЗАДАНИЕ</button>
+            <button class="btn btn-small" id="nextTaskBtn" disabled>➡ ДАЛЕЕ</button>
         </div>
     </div>
 
-    <!-- ФИНАЛЬНЫЙ ЭКРАН -->
-    <div id="finalScreen" class="screen final-screen">
-        <div class="story-card" style="text-align:center;">
-            <h2 class="congrats">🌟 ВРЕМЕННАЯ ПЕТЛЯ РАЗОРВАНА!</h2>
-            <p style="font-size:1.4rem; margin:25px 0;">Ты успешно восстановил все алгоритмы циклов с условием.<br>Орбитальная станция «Алгоритм» возвращается в нормальное время.</p>
-            <p style="font-size:1.2rem; margin:20px 0;">🏆 <strong>Цикл с предусловием (while)</strong> — проверка условия выполняется перед каждой итерацией тела цикла.<br>🔄 <strong>Цикл с постусловием</strong> — сначала выполняется тело цикла, затем проверяется условие.<br>📚 «Повторение — алгоритмическая конструкция, представляющая собой последовательность действий, выполняемых многократно» (страницы 2, 15 учебника).</p>
-            <div class="action-buttons">
-                <button class="btn" id="restartBtn">🔄 ПРОЙТИ МИССИЮ ЗАНОВО</button>
-                <button class="btn" id="backToStartBtn">🏠 ВЕРНУТЬСЯ НА СТАРТОВЫЙ ЭКРАН</button>
-            </div>
+    <div id="finalScreen" class="screen">
+        <div class="start-card" style="text-align:center;">
+            <h2 style="font-size:2.4rem; color:#7effe6;">✨ ВЕРИФИКАЦИЯ ЗАВЕРШЕНА! ✨</h2>
+            <p style="font-size:2rem; margin:30px 0;"><strong id="finalScoreSpan">0</strong> / 10 правильных ответов</p>
+            <p style="font-size:1.8rem; font-weight:bold; background:#022b3b; display:inline-block; padding:12px 34px; border-radius:80px;">🔓 ПАРОЛЬ УСПЕШНО ОБНОВЛЕН!</p>
+            <div style="margin-top:40px;"><button class="btn" id="returnArchiveBtn">🏛️ ВЕРНУТЬСЯ В АРХИВ</button></div>
         </div>
     </div>
+    <footer>⚡ ПУЛЬТ УПРАВЛЕНИЯ · ЦИКЛ WHILE (Python)</footer>
 </div>
 
 <script>
-    (function(){
-        "use strict";
-
-        // ---------- ДАННЫЕ ЗАДАНИЙ (СТРОГО ПО МАТЕРИАЛУ PDF, ПОЛНЫЕ ФОРМУЛИРОВКИ) ----------
-        const tasks = [
-            { 
-                type: 'matching',
-                title: '📌 Задание 1. Стыковочный узел: цикл с предусловием или цикл с постусловием',
-                mnemo: 'Страницы 10, 15: предусловие — цикл-ПОКА (while), постусловие — конструкция «кц_при»',
-                instruction: 'Перетащи каждое описание алгоритма в соответствующую категорию. Блоки можно возвращать обратно в область выбора.',
-                draggables: [
-                    { text: 'Оператор while (условие) { тело цикла }', category: 'while' },
-                    { text: 'Цикл-ПОКА (цикл с предусловием), страница 10 учебника', category: 'while' },
-                    { text: 'Алгоритм заучивания четверостишия: повторять чтение, пока не сделана ошибка (страница 15)', category: 'post' },
-                    { text: 'пока (переменная a меньше или равна 9) выполнять рисование окружности (страница 11)', category: 'while' }
-                ],
-                categories: [
-                    { id: 'while', label: '🔷 ЦИКЛ С ПРЕДУСЛОВИЕМ (while, цикл-ПОКА)' },
-                    { id: 'post', label: '🔶 ЦИКЛ С ПОСТУСЛОВИЕМ (сначала тело, потом проверка)' }
-                ],
-                solution: { 'while': 3, 'post': 1 }
-            },
-            { 
-                type: 'sequence',
-                title: '🏃 Задание 2. Тренировка спортсмена: восстанови алгоритм увеличения пробега',
-                mnemo: 'Задача о тренировках: начальный пробег 10 километров, каждый следующий день увеличивается на 10 процентов, пока дневной пробег меньше 25 километров (страница 17)',
-                instruction: 'Кликай по шагам алгоритма в правильном порядке (от первого к четвёртому). Кликни на заполненный слот, чтобы отменить выбор.',
-                items: [
-                    'Присвоить переменной x значение 10 (начальный пробег в первый день)',
-                    'Пока значение переменной x меньше 25, выполнять:',
-                    '    Увеличить значение переменной x на 10 процентов: x = x + 0.1 * x',
-                    'Вывести сообщение «Спортсмен достиг или превысил 25 километров»'
-                ],
-                solutionOrder: [0, 1, 2, 3]
-            },
-            { 
-                type: 'dragDrop',
-                title: '⚠️ Задание 3. Опасность бесконечного цикла: правильные и ошибочные действия',
-                mnemo: 'Алгоритм деления вычитанием: r = r - y; q = q + 1. Условие r >= y должно изменяться, иначе цикл не завершится (страница 13)',
-                instruction: 'Перетащи блоки в правильные зоны. Действия, которые изменяют условие и приближают выход из цикла — в левую зону. Действия, которые приводят к зацикливанию — в правую.',
-                draggables: [
-                    { text: 'Уменьшить значение переменной r на y: r = r - y', correct: 'true' },
-                    { text: 'Увеличить счётчик частного на единицу: q = q + 1', correct: 'true' },
-                    { text: 'Пропустить оставшуюся часть тела цикла и перейти к следующей итерации (оператор continue) без изменения условия', correct: 'false' },
-                    { text: 'Бесконечный цикл: while (истина) { }', correct: 'false' }
-                ],
-                dropZones: [
-                    { label: '✅ ПРАВИЛЬНЫЕ ДЕЙСТВИЯ В ТЕЛЕ ЦИКЛА (изменяют условие, цикл завершится)', acceptsCorrect: 'true' },
-                    { label: '❌ ДЕЙСТВИЯ, ПРИВОДЯЩИЕ К ЗАЦИКЛИВАНИЮ (условие не меняется или всегда истинно)', acceptsCorrect: 'false' }
-                ]
-            },
-            { 
-                type: 'matching',
-                title: '🔬 Задание 4. Лаборатория терминов: основные понятия циклических алгоритмов',
-                mnemo: 'Страницы 2, 5: тело цикла, итерация (шаг цикла), циклический алгоритм',
-                instruction: 'Сопоставь каждое определение с соответствующим термином. Перетаскивай свободно, можно возвращать.',
-                draggables: [
-                    { text: 'Последовательность действий, многократно повторяющаяся в процессе выполнения цикла', category: 'body' },
-                    { text: 'Однократное выполнение тела цикла', category: 'iteration' },
-                    { text: 'Алгоритмическая конструкция повторения (например, цикл с предусловием while)', category: 'loop' }
-                ],
-                categories: [
-                    { id: 'body', label: '📦 ТЕЛО ЦИКЛА' },
-                    { id: 'iteration', label: '🔄 ИТЕРАЦИЯ (ШАГ ЦИКЛА)' },
-                    { id: 'loop', label: '♾️ ЦИКЛ (ЦИКЛИЧЕСКИЙ АЛГОРИТМ)' }
-                ],
-                solution: { 'body': 1, 'iteration': 1, 'loop': 1 }
-            },
-            { 
-                type: 'sequence',
-                title: '📊 Задание 5. Блок-схема: вычислить значение переменной b',
-                mnemo: 'Алгоритм со страницы 16: переменной a присвоить 1; переменной b присвоить 1; пока a не равно 8: a = a * 2; b = b + a;',
-                instruction: 'Восстанови правильную последовательность шагов блок-схемы (от начала до вывода результата).',
-                items: [
-                    'Присвоить переменной a значение 1; присвоить переменной b значение 1',
-                    'Умножить значение переменной a на 2: a = a * 2',
-                    'Увеличить значение переменной b на a: b = b + a',
-                    'Вывести значение переменной b'
-                ],
-                solutionOrder: [0, 1, 2, 3]
-            },
-            { 
-                type: 'dragDrop',
-                title: '🤖 Задание 6. Робот-художник: цикл с параметром или цикл с условием',
-                mnemo: 'Страницы 6, 11: команда «повтори (16)» — цикл с заданным числом повторений (цикл-ДЛЯ); «пока (a <= 9)» — цикл с условием',
-                instruction: 'Раздели примеры алгоритмов: цикл с параметром (заданное число повторений) и цикл с условием (пока выполняется условие).',
-                draggables: [
-                    { text: 'повтори (16) { нарисовать квадрат } (страница 6)', correct: 'for' },
-                    { text: 'пока (переменная a меньше или равна 9) { нарисовать окружность } (страница 11)', correct: 'while' },
-                    { text: 'повтори (5) { нарисовать ромб } (страница 7)', correct: 'for' }
-                ],
-                dropZones: [
-                    { label: '🔢 ЦИКЛ С ПАРАМЕТРОМ (цикл-ДЛЯ, заданное число повторений)', acceptsCorrect: 'for' },
-                    { label: '🔁 ЦИКЛ С УСЛОВИЕМ (цикл-ПОКА, предусловие)', acceptsCorrect: 'while' }
-                ]
-            },
-            { 
-                type: 'matching',
-                title: '🧮 Задание 7. Алгоритм деления вычитанием: частное и остаток',
-                mnemo: 'Страница 13: r равно x; q равно 0; пока r больше или равно y: r = r - y; q = q + 1;',
-                instruction: 'Сопоставь переменные с их ролью в алгоритме нахождения частного и остатка.',
-                draggables: [
-                    { text: 'Переменная x — начальное значение делимого, вводится пользователем', category: 'x' },
-                    { text: 'Переменная q — накапливает количество вычитаний (частное от деления)', category: 'q' },
-                    { text: 'Переменная r — остаток от деления после завершения цикла', category: 'r' }
-                ],
-                categories: [
-                    { id: 'x', label: '📥 ПЕРЕМЕННАЯ x (ДЕЛИМОЕ)' },
-                    { id: 'q', label: '📈 ПЕРЕМЕННАЯ q (СЧЁТЧИК, ЧАСТНОЕ)' },
-                    { id: 'r', label: '🧮 ПЕРЕМЕННАЯ r (ОСТАТОК)' }
-                ],
-                solution: { 'x': 1, 'q': 1, 'r': 1 }
-            }
-        ];
-
-        // ---------- ГЛОБАЛЬНОЕ СОСТОЯНИЕ ----------
-        let currentTaskIndex = 0;
-        let taskCompleted = false;
-        const totalTasks = tasks.length;
-        let gameProgress = 0;
-
-        const startScreen = document.getElementById('startScreen');
-        const gameScreen = document.getElementById('gameScreen');
-        const finalScreen = document.getElementById('finalScreen');
-        const taskTitle = document.getElementById('taskTitle');
-        const mnemoHint = document.getElementById('mnemoHint');
-        const playArea = document.getElementById('playArea');
-        const feedbackMsg = document.getElementById('feedbackMsg');
-        const nextBtn = document.getElementById('nextTaskBtn');
-        const resetTaskBtn = document.getElementById('resetTaskBtn');
-        const progressFill = document.getElementById('progressFill');
-        const progressFraction = document.getElementById('progressFraction');
-        const startBtn = document.getElementById('startBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const backToStartBtn = document.getElementById('backToStartBtn');
-
-        function updateProgress() {
-            const percent = (gameProgress / totalTasks) * 100;
-            progressFill.style.width = percent + '%';
-            progressFraction.textContent = `${gameProgress}/${totalTasks}`;
+    function setLedColor(isCorrect = null) {
+        const led = document.getElementById('sysLed');
+        if (isCorrect === true) {
+            led.style.background = "#2effb0"; led.style.boxShadow = "0 0 18px #00ff88";
+            led.classList.remove('red-glow'); led.classList.add('green-glow');
+            setTimeout(() => { if(led) led.style.boxShadow = "0 0 8px #0f0"; }, 300);
+        } else if (isCorrect === false) {
+            led.style.background = "#ff3366"; led.style.boxShadow = "0 0 22px #ff1133";
+            led.classList.add('red-glow');
+            setTimeout(() => { if(led) { led.style.background = "#2effb0"; led.classList.remove('red-glow'); led.style.boxShadow = "0 0 8px #0f0"; } }, 400);
+        } else {
+            led.style.background = "#2effb0"; led.style.boxShadow = "0 0 8px #0f0";
         }
+    }
 
-        function showScreen(screenId) {
-            startScreen.classList.remove('active');
-            gameScreen.classList.remove('active');
-            finalScreen.classList.remove('active');
-            document.getElementById(screenId).classList.add('active');
+    // ========== ЭТАЛОНЫ ДЛЯ ПРОВЕРКИ КОДА (пишутся строго в столбик) ==========
+    const CODE_ANSWERS = {
+        "sum1to10": `i = 1
+sum = 0
+while i <= 10:
+    sum = sum + i
+    i = i + 1
+print(sum)`,
+        "factorial5": `i = 1
+factorial = 1
+while i <= 5:
+    factorial = factorial * i
+    i = i + 1
+print(factorial)`,
+        "table3": `i = 1
+while i <= 10:
+    print(f"3*{i}={3*i}")
+    i = i + 1`,
+        "even_sum": `n = 10
+s = 0
+while n > 0:
+    if n % 2 == 0:
+        s = s + n
+    n = n - 1
+print(s)`
+    };
+
+    // Функция нормализации кода (удаляем лишние пробелы, но сохраняем структуру)
+    function normalizeCode(code) {
+        return code.replace(/\r/g, '').trim();
+    }
+
+    // 10 ЗАДАНИЙ
+    const TASKS = [
+        {   // 0: предсказание
+            type: "predict", title: "🔮 ПРЕДСКАЖИ ВЫВОД", desc: "Что будет выведено на экран?",
+            code: "x = 1\nwhile x < 10:\n    x = x * 2\nprint(x)", correct: "16", hint: "1→2→4→8→16"
+        },
+        {   // 1: СОПОСТАВЛЕНИЕ (хаотичный порядок)
+            type: "matching_new",
+            title: "🧩 СООТНЕСИ КОД И ОПИСАНИЕ",
+            desc: "Перетащите каждый фрагмент кода слева к правильному описанию справа. Порядок элементов перемешан.",
+            codeItems: [
+                "while i < 5:\n    print(i)\n    i = i + 1",
+                "while x != 0:\n    x = x - 1",
+                "while True:\n    print('бесконечно')",
+                "while count <= 10:\n    count = count + 1"
+            ],
+            defItems: [
+                "Цикл выполняется, пока i меньше 5",
+                "Цикл выполняется, пока x не равен 0",
+                "Бесконечный цикл (условие всегда истинно)",
+                "Цикл выполняется, пока count ≤ 10"
+            ],
+            correctPairs: [[0,0], [1,1], [2,2], [3,3]]
+        },
+        {   // 2: написать код СУММА 1..10
+            type: "write_code", 
+            title: "✍️ НАПИШИ ЦИКЛ WHILE", 
+            desc: "Напишите цикл while, который вычисляет сумму чисел от 1 до 10 и выводит результат.",
+            expectedCode: CODE_ANSWERS.sum1to10,
+            hint: CODE_ANSWERS.sum1to10
+        },
+        {   // 3: группировка
+            type: "drag_group", 
+            title: "📦 ЗАВЕРШЕНИЕ ЦИКЛА", 
+            desc: "Распределите: какие условия завершат цикл, а какие приведут к бесконечности.",
+            items: ["x < 5 при x = 10", "x != 0 при x = 0", "True (всегда истина)", "i > 3 при i = 2"],
+            groups: ["✅ Цикл завершится (условие ложно)", "♾️ Бесконечный цикл (условие истинно)"],
+            correctMap: [0,0,1,1]
+        },
+        {   // 4: предсказание (сумма чётных)
+            type: "predict", title: "📊 ВЫЧИСЛИ РЕЗУЛЬТАТ", desc: "Что выведет программа?",
+            code: "n = 10\ns = 0\nwhile n > 0:\n    if n % 2 == 0:\n        s = s + n\n    n = n - 1\nprint(s)", correct: "30", hint: "10+8+6+4+2=30"
+        },
+        {   // 5: СОПОСТАВЛЕНИЕ (хаотичный порядок)
+            type: "matching_new",
+            title: "⚙️ СООТНЕСИ ЧАСТИ АЛГОРИТМА",
+            desc: "Соедините фрагмент кода с его ролью в алгоритме. Элементы перемешаны.",
+            codeItems: ["result = 1", "while result < 100:", "result = result * 2", "print(result)"],
+            defItems: ["начальное значение", "условие цикла", "изменение переменной", "вывод результата"],
+            correctPairs: [[0,0], [1,1], [2,2], [3,3]]
+        },
+        {   // 6: написать код ФАКТОРИАЛ
+            type: "write_code", 
+            title: "📝 ФАКТОРИАЛ ЧИСЛА", 
+            desc: "Напишите цикл while для вычисления 5! (5*4*3*2*1) и вывода результата.",
+            expectedCode: CODE_ANSWERS.factorial5,
+            hint: CODE_ANSWERS.factorial5
+        },
+        {   // 7: предсказание (звёздочки)
+            type: "predict", title: "🌟 ЧТО ВЫВЕДЕТ КОД?", desc: "Введите результат (три строки)",
+            code: "i = 1\nwhile i <= 3:\n    j = 1\n    while j <= i:\n        print('*', end='')\n        j = j + 1\n    print()\n    i = i + 1", 
+            correct: "*\n**\n***", hint: "пирамидка из звёздочек"
+        },
+        {   // 8: последовательность
+            type: "sequence_drag", 
+            title: "🔄 УПОРЯДОЧИ АЛГОРИТМ", 
+            desc: "Расставьте шаги алгоритма суммы цифр числа 123 (результат 6).",
+            steps: ["sum = 0", "num = 123", "while num > 0:", "digit = num % 10", "sum = sum + digit", "num = num // 10", "print(sum)"],
+            correctOrder: [0,1,2,3,4,5,6]
+        },
+        {   // 9: написать код ТАБЛИЦА УМНОЖЕНИЯ
+            type: "write_code", 
+            title: "🧮 ТАБЛИЦА УМНОЖЕНИЯ", 
+            desc: "Напишите цикл while для вывода таблицы умножения на 3 (3*1=3 ... 3*10=30).",
+            expectedCode: CODE_ANSWERS.table3,
+            hint: CODE_ANSWERS.table3
         }
+    ];
 
-        function resetGame() {
-            currentTaskIndex = 0;
-            gameProgress = 0;
-            taskCompleted = false;
-            updateProgress();
-            renderTask(currentTaskIndex);
-            showScreen('gameScreen');
-            nextBtn.disabled = true;
-            feedbackMsg.innerHTML = '✨ Выполни задание, капитан! Перетаскивай блоки с вариантами, кликай для построения последовательности.';
+    let studentSkill = 5;
+    let totalCorrect = 0;
+    let currentTaskIdx = 0;
+    let isAnswered = false;
+    let currentTask = null;
+
+    const startScreen = document.getElementById('startScreen');
+    const gameScreen = document.getElementById('gameScreen');
+    const finalScreen = document.getElementById('finalScreen');
+    const startBtn = document.getElementById('startMissionBtn');
+    const nextBtn = document.getElementById('nextTaskBtn');
+    const resetBtn = document.getElementById('resetTaskBtn');
+    const returnBtn = document.getElementById('returnArchiveBtn');
+    const correctSpan = document.getElementById('correctCount');
+    const finalSpan = document.getElementById('finalScoreSpan');
+    const progressFill = document.getElementById('progressFillGame');
+    const taskNumberSpan = document.getElementById('taskNumberLabel');
+    const taskTitleEl = document.getElementById('taskTitleDynamic');
+    const taskArea = document.getElementById('taskContentArea');
+    const feedbackDiv = document.getElementById('globalFeedbackMessage');
+
+    function updateProgress() {
+        let percent = (currentTaskIdx / TASKS.length) * 100;
+        progressFill.style.width = percent + "%";
+        taskNumberSpan.innerText = `ЗАДАНИЕ ${currentTaskIdx+1}/${TASKS.length}`;
+        correctSpan.innerText = totalCorrect;
+    }
+
+    function completeTask(isSuccess) {
+        if (isAnswered) return;
+        isAnswered = true;
+        if (isSuccess) {
+            totalCorrect++;
+            correctSpan.innerText = totalCorrect;
+            feedbackDiv.innerHTML = "✅ ВЕРНО! Система повышает уровень сложности.";
+            setLedColor(true);
+            studentSkill = Math.min(10, studentSkill + 1);
+        } else {
+            feedbackDiv.innerHTML = `❌ НЕВЕРНО. ${currentTask.hint || 'Попробуйте ещё раз.'}`;
+            setLedColor(false);
+            studentSkill = Math.max(1, studentSkill - 1);
         }
+        nextBtn.disabled = false;
+    }
 
-        function handleTaskComplete(success = true) {
-            if (!taskCompleted) {
-                taskCompleted = true;
-                gameProgress++;
-                updateProgress();
-                feedbackMsg.innerHTML = success 
-                    ? '✅ Задание выполнено верно! Цикл стабилизирован. Можно двигаться дальше.' 
-                    : '⚠️ Почти правильно, но есть ошибки. Попробуй сбросить задание и выполнить заново.';
-                if (gameProgress === totalTasks) {
-                    setTimeout(() => { showScreen('finalScreen'); }, 300);
-                } else {
-                    nextBtn.disabled = false;
+    // Функция проверки кода (строгое сравнение с эталоном)
+    function checkCodeEquality(userCode, expectedCode) {
+        let normalizedUser = normalizeCode(userCode);
+        let normalizedExpected = normalizeCode(expectedCode);
+        return normalizedUser === normalizedExpected;
+    }
+
+    function renderTask() {
+        currentTask = TASKS[currentTaskIdx];
+        taskTitleEl.innerText = `${currentTask.title}  [адаптация: ${studentSkill}]`;
+        let html = `<p style="margin-bottom:16px; font-weight:bold;">${currentTask.desc}</p>`;
+
+        if (currentTask.type === "predict") {
+            html += `<div class="code-block">${currentTask.code.replace(/\n/g,'<br>')}</div>`;
+            html += `<input type="text" id="answerInput" class="code-input" placeholder="Введите ответ">`;
+            html += `<div style="margin-top:16px;"><button id="checkPredictBtn" class="btn btn-small">🔍 ПРОВЕРИТЬ</button></div>`;
+            taskArea.innerHTML = html;
+            document.getElementById('checkPredictBtn').addEventListener('click', () => {
+                if (isAnswered) return;
+                let user = document.getElementById('answerInput').value.trim();
+                let expected = currentTask.correct;
+                let ok = (user === expected) || (user.replace(/\s/g,'') === expected.replace(/\s/g,''));
+                completeTask(ok);
+            });
+        }
+        else if (currentTask.type === "write_code") {
+            html += `<textarea id="codeArea" rows="8" class="code-input" placeholder="Напишите код Python в столбик (с отступами)&#10;Пример:&#10;i = 1&#10;while i <= 10:&#10;    print(i)&#10;    i = i + 1"></textarea>`;
+            html += `<div style="margin-top:16px;"><button id="checkCodeBtn" class="btn btn-small">✅ ПРОВЕРИТЬ КОД</button></div>`;
+            taskArea.innerHTML = html;
+            document.getElementById('checkCodeBtn').addEventListener('click', () => {
+                if (isAnswered) return;
+                let code = document.getElementById('codeArea').value;
+                let ok = checkCodeEquality(code, currentTask.expectedCode);
+                if (!ok) {
+                    // Показываем подсказку
+                    feedbackDiv.innerHTML = `❌ Код не совпадает с эталоном. Правильный вариант:<br><pre style="background:#030e17; padding:10px; border-radius:16px; margin-top:8px;">${currentTask.expectedCode}</pre>`;
                 }
-            }
+                completeTask(ok);
+            });
         }
-
-        function goToNextTask() {
-            if (gameProgress < totalTasks && taskCompleted) {
-                currentTaskIndex++;
-                taskCompleted = false;
-                renderTask(currentTaskIndex);
-                nextBtn.disabled = true;
-                feedbackMsg.innerHTML = '✨ Новое задание! Внимательно читай инструкцию и перетаскивай блоки.';
+        else if (currentTask.type === "matching_new") {
+            // Перемешиваем элементы в хаотичном порядке
+            let codeItems = [...currentTask.codeItems];
+            let defItems = [...currentTask.defItems];
+            let correctPairs = [...currentTask.correctPairs];
+            
+            // Перемешиваем codeItems и сохраняем соответствие
+            let codeIndices = codeItems.map((_, i) => i);
+            for (let i = codeIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [codeIndices[i], codeIndices[j]] = [codeIndices[j], codeIndices[i]];
             }
-        }
-
-        // ---------- РЕНДЕР ЗАДАНИЙ ----------
-        function renderTask(index) {
-            const task = tasks[index];
-            taskTitle.textContent = `Задание ${index+1} из ${totalTasks}: ${task.title}`;
-            mnemoHint.textContent = `🧠 ${task.mnemo}`;
-            let html = `<p style="margin-bottom:16px; font-size:1.2rem; font-weight:500;">${task.instruction}</p>`;
-
-            if (task.type === 'matching') {
-                const shuffled = [...task.draggables].sort(() => Math.random() - 0.5);
-                html += `<div class="drag-container" id="matchingDrags">`;
-                shuffled.forEach((d, i) => {
-                    html += `<div class="draggable" draggable="true" data-category="${d.category}" data-original="${d.text.replace(/"/g, '&quot;')}" id="drag-${Date.now()}-${i}">${d.text}</div>`;
-                });
-                html += `</div><div class="dropzones" id="matchingZones">`;
-                task.categories.forEach(cat => {
-                    html += `<div class="dropzone" data-cat="${cat.id}"><strong>${cat.label}</strong><div class="dropped-items"></div></div>`;
-                });
-                html += `</div><button class="btn small-btn" id="checkMatchingBtn" style="margin-top:20px;">🔍 ПРОВЕРИТЬ СОПОСТАВЛЕНИЕ</button>`;
-                playArea.innerHTML = html;
-                setupMatching(task);
-            } 
-            else if (task.type === 'dragDrop') {
-                const shuffled = [...task.draggables].sort(() => Math.random() - 0.5);
-                html += `<div class="drag-container" id="dragDropDrags">`;
-                shuffled.forEach((d, i) => { 
-                    html += `<div class="draggable" draggable="true" data-correct="${d.correct}" id="drag-${Date.now()}-${i}">${d.text}</div>`; 
-                });
-                html += `</div><div class="dropzones">`;
-                task.dropZones.forEach((zone, idx) => {
-                    html += `<div class="dropzone" data-accept="${zone.acceptsCorrect}"><strong>${zone.label}</strong><div class="dropped-items"></div></div>`;
-                });
-                html += `</div><button class="btn small-btn" id="checkDragDropBtn" style="margin-top:20px;">🔍 ПРОВЕРИТЬ РАСПРЕДЕЛЕНИЕ</button>`;
-                playArea.innerHTML = html;
-                setupDragDrop(task);
+            let shuffledCodeItems = codeIndices.map(i => codeItems[i]);
+            
+            // Перемешиваем defItems
+            let defIndices = defItems.map((_, i) => i);
+            for (let i = defIndices.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [defIndices[i], defIndices[j]] = [defIndices[j], defIndices[i]];
             }
-            else if (task.type === 'sequence') {
-                const items = [...task.items];
-                const shuffledIndices = [...Array(items.length).keys()].sort(() => Math.random() - 0.5);
-                html += `<div class="choice-buttons" id="seqChoices">`;
-                shuffledIndices.forEach(origIdx => {
-                    html += `<div class="choice-btn" data-seqindex="${origIdx}">${items[origIdx]}</div>`;
-                });
-                html += `</div>`;
-                html += `<div class="sequence-row" id="seqSlots">`;
-                for (let i = 0; i < items.length; i++) {
-                    html += `<div class="seq-slot" data-slot="${i}">${i+1}</div>`;
-                }
-                html += `</div><button class="btn small-btn" id="checkSeqBtn">🔍 ПРОВЕРИТЬ ПОСЛЕДОВАТЕЛЬНОСТЬ</button>`;
-                playArea.innerHTML = html;
-                setupSequence(task);
+            let shuffledDefItems = defIndices.map(i => defItems[i]);
+            
+            // Создаём карту правильных соответствий с учётом перемешивания
+            let correctMap = new Map();
+            for (let pair of correctPairs) {
+                let originalCodeIdx = pair[0];
+                let originalDefIdx = pair[1];
+                let newCodeIdx = codeIndices.indexOf(originalCodeIdx);
+                let newDefIdx = defIndices.indexOf(originalDefIdx);
+                correctMap.set(newCodeIdx, newDefIdx);
             }
-        }
-
-        // ---------- НАСТРОЙКА MATCHING (С ВОЗВРАТОМ) ----------
-        function setupMatching(task) {
-            const drags = document.querySelectorAll('.draggable');
-            const zones = document.querySelectorAll('.dropzone');
-            const checkBtn = document.getElementById('checkMatchingBtn');
-
-            function makeDraggable(el) {
-                el.setAttribute('draggable', 'true');
-                el.addEventListener('dragstart', e => {
-                    e.dataTransfer.setData('text/plain', el.dataset.category + '|' + el.textContent + '|' + (el.dataset.original || el.textContent));
-                });
+            
+            html += `<div class="matching-grid">`;
+            html += `<div class="code-items"><h3>📜 Фрагменты кода (перетащи к описанию)</h3>`;
+            for (let i=0; i<shuffledCodeItems.length; i++) {
+                html += `<div class="code-item" draggable="true" data-codeidx="${i}" data-matched="false">${shuffledCodeItems[i].replace(/\n/g,'<br>')}</div>`;
             }
-
-            drags.forEach(d => makeDraggable(d));
-
-            zones.forEach(z => {
-                z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('active-drop'); });
-                z.addEventListener('dragleave', () => z.classList.remove('active-drop'));
-                z.addEventListener('drop', e => {
+            html += `</div><div class="definition-items"><h3>📖 Описания (сюда перетаскивай)</h3>`;
+            for (let i=0; i<shuffledDefItems.length; i++) {
+                html += `<div class="def-item" data-defidx="${i}">${shuffledDefItems[i]}</div>`;
+            }
+            html += `</div></div><button id="checkMatchingBtn" class="btn btn-small">🔗 ПРОВЕРИТЬ СООТВЕТСТВИЕ</button>`;
+            taskArea.innerHTML = html;
+            
+            let matchedCode = new Array(shuffledCodeItems.length).fill(false);
+            let matchedDef = new Array(shuffledDefItems.length).fill(false);
+            let currentDragCodeIdx = null;
+            
+            const codeEls = document.querySelectorAll('.code-item');
+            const defEls = document.querySelectorAll('.def-item');
+            
+            codeEls.forEach(el => {
+                el.addEventListener('dragstart', (e) => {
+                    if (el.dataset.matched === 'true') { e.preventDefault(); return false; }
+                    currentDragCodeIdx = parseInt(el.dataset.codeidx);
+                    e.dataTransfer.setData('text/plain', currentDragCodeIdx);
+                    e.dataTransfer.effectAllowed = 'copy';
+                });
+                el.addEventListener('dragover', (e) => e.preventDefault());
+            });
+            
+            defEls.forEach(def => {
+                def.addEventListener('dragover', (e) => e.preventDefault());
+                def.addEventListener('drop', (e) => {
                     e.preventDefault();
-                    z.classList.remove('active-drop');
-                    const data = e.dataTransfer.getData('text/plain');
-                    if (!data) return;
-                    const [cat, text, original] = data.split('|');
-                    const displayText = original || text;
+                    if (currentDragCodeIdx === null) return;
+                    const defIdx = parseInt(def.dataset.defidx);
+                    const codeIdx = currentDragCodeIdx;
                     
-                    if (cat === z.dataset.cat) {
-                        const container = z.querySelector('.dropped-items');
-                        const draggedEl = Array.from(document.querySelectorAll('.draggable')).find(el => el.textContent === displayText);
-                        if (draggedEl && draggedEl.closest('.drag-container')) {
-                            draggedEl.remove();
-                            const newEl = document.createElement('div');
-                            newEl.className = 'dropped-item';
-                            newEl.textContent = displayText;
-                            newEl.dataset.category = cat;
-                            newEl.dataset.original = displayText;
-                            newEl.setAttribute('draggable', 'true');
-                            newEl.addEventListener('dragstart', e2 => {
-                                e2.dataTransfer.setData('text/plain', cat + '|' + displayText + '|' + displayText);
-                            });
-                            container.appendChild(newEl);
-                        }
+                    const isCorrect = (correctMap.get(codeIdx) === defIdx);
+                    
+                    if (isCorrect && !matchedCode[codeIdx] && !matchedDef[defIdx]) {
+                        matchedCode[codeIdx] = true;
+                        matchedDef[defIdx] = true;
+                        const codeEl = document.querySelector(`.code-item[data-codeidx='${codeIdx}']`);
+                        const defEl = document.querySelector(`.def-item[data-defidx='${defIdx}']`);
+                        codeEl.classList.add('matched');
+                        defEl.classList.add('matched');
+                        defEl.innerHTML = `✅ ${defEl.innerHTML}`;
+                        feedbackDiv.innerHTML = `✔️ Сопоставлено верно!`;
                     } else {
-                        feedbackMsg.innerHTML = '❌ Этот блок не соответствует выбранной категории. Проверьте материал на страницах 10-15.';
+                        feedbackDiv.innerHTML = `❌ Неверное сопоставление! Попробуйте другой вариант.`;
+                        setLedColor(false);
+                        setTimeout(() => setLedColor(null), 300);
                     }
+                    currentDragCodeIdx = null;
                 });
             });
-
-            document.addEventListener('dragover', e => e.preventDefault());
-            document.addEventListener('drop', e => {
-                const dragContainer = document.querySelector('.drag-container');
-                if (dragContainer && e.target.closest('.drag-container')) {
-                    e.preventDefault();
-                    const data = e.dataTransfer.getData('text/plain');
-                    if (!data) return;
-                    const [cat, text, original] = data.split('|');
-                    const displayText = original || text;
-                    const droppedItem = Array.from(document.querySelectorAll('.dropped-item')).find(el => el.textContent === displayText);
-                    if (droppedItem) {
-                        droppedItem.remove();
-                        const newDrag = document.createElement('div');
-                        newDrag.className = 'draggable';
-                        newDrag.textContent = displayText;
-                        newDrag.dataset.category = cat;
-                        newDrag.dataset.original = displayText;
-                        newDrag.setAttribute('draggable', 'true');
-                        makeDraggable(newDrag);
-                        dragContainer.appendChild(newDrag);
-                    }
-                }
-            });
-
-            checkBtn.addEventListener('click', () => {
-                const zoneMap = {};
-                zones.forEach(z => { 
-                    zoneMap[z.dataset.cat] = z.querySelectorAll('.dropped-item').length; 
-                });
-                let correct = true;
-                for (let cat in task.solution) {
-                    if (zoneMap[cat] !== task.solution[cat]) correct = false;
-                }
-                const remainingDrags = document.querySelectorAll('.drag-container .draggable').length;
-                if (correct && remainingDrags === 0) {
-                    handleTaskComplete(true);
-                } else {
-                    feedbackMsg.innerHTML = '⚠️ Не все элементы распределены верно. Проверьте соответствия (страницы 10-15 учебника). Можно перетащить блоки обратно и попробовать снова.';
-                }
+            
+            document.getElementById('checkMatchingBtn').addEventListener('click', () => {
+                if (isAnswered) return;
+                let allMatched = matchedCode.every(v => v === true);
+                completeTask(allMatched);
             });
         }
-
-        // ---------- DRAG & DROP (С ВОЗВРАТОМ) ----------
-        function setupDragDrop(task) {
-            const drags = document.querySelectorAll('.draggable');
-            const zones = document.querySelectorAll('.dropzone');
-            const checkBtn = document.getElementById('checkDragDropBtn');
-
-            function makeDraggable(el) {
-                el.setAttribute('draggable', 'true');
-                el.addEventListener('dragstart', e => {
-                    e.dataTransfer.setData('text/plain', el.dataset.correct + '|' + el.textContent);
+        else if (currentTask.type === "drag_group") {
+            html += `<div class="drag-group" id="dragItemsContainer">`;
+            currentTask.items.forEach((item, idx) => { html += `<div class="drag-item" draggable="true" data-itemidx="${idx}">${item}</div>`; });
+            html += `</div><div class="flex-between" style="gap:20px;">`;
+            currentTask.groups.forEach((grp, gidx) => {
+                html += `<div class="drop-zone" data-groupidx="${gidx}" style="min-width:240px;"><strong>${grp}</strong><div id="group-${gidx}" style="min-height:70px; margin-top:10px;"></div></div>`;
+            });
+            html += `</div><button id="checkGroupBtn" class="btn btn-small">📦 ПРОВЕРИТЬ ГРУППЫ</button>`;
+            taskArea.innerHTML = html;
+            let placed = {0:[],1:[]};
+            const drags = document.querySelectorAll('.drag-item');
+            const zones = document.querySelectorAll('.drop-zone');
+            drags.forEach(d => d.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', d.dataset.itemidx)));
+            zones.forEach(zone => {
+                zone.addEventListener('dragover', e => e.preventDefault());
+                zone.addEventListener('drop', e => {
+                    e.preventDefault();
+                    let idx = parseInt(e.dataTransfer.getData('text/plain'));
+                    let groupIdx = parseInt(zone.dataset.groupidx);
+                    let correctGroup = currentTask.correctMap[idx];
+                    if (correctGroup === groupIdx) {
+                        let targetDiv = zone.querySelector(`#group-${groupIdx}`);
+                        let dragEl = document.querySelector(`.drag-item[data-itemidx='${idx}']`);
+                        if (dragEl && dragEl.parentElement.classList.contains('drag-group')) {
+                            dragEl.remove();
+                            let span = document.createElement('div'); 
+                            span.innerText = currentTask.items[idx]; 
+                            span.style.background = "#1c8870"; span.style.padding = "8px"; span.style.borderRadius = "30px"; span.style.margin = "4px";
+                            targetDiv.appendChild(span);
+                            placed[groupIdx].push(idx);
+                        }
+                    } else { feedbackDiv.innerHTML = "⚠️ Неверная группа!"; }
+                });
+            });
+            document.getElementById('checkGroupBtn').addEventListener('click', () => {
+                if (isAnswered) return;
+                let ok = true;
+                for (let i=0; i<currentTask.items.length; i++) {
+                    let grp = currentTask.correctMap[i];
+                    if (!placed[grp].includes(i)) ok = false;
+                }
+                completeTask(ok);
+            });
+        }
+        else if (currentTask.type === "sequence_drag") {
+            html += `<p>Перетащите блоки в правильном порядке (сверху вниз)</p><div id="seqList" class="drag-group" style="flex-direction:column; gap:10px;"></div>`;
+            taskArea.innerHTML = html;
+            let steps = [...currentTask.steps];
+            const container = document.getElementById('seqList');
+            function renderSeq() {
+                container.innerHTML = '';
+                steps.forEach((step, idx) => {
+                    let div = document.createElement('div');
+                    div.className = "drag-item"; div.innerText = step; div.draggable = true; div.dataset.idx = idx;
+                    div.addEventListener('dragstart', e => e.dataTransfer.setData('text/plain', idx));
+                    div.addEventListener('dragover', e => e.preventDefault());
+                    div.addEventListener('drop', e => {
+                        e.preventDefault();
+                        let from = parseInt(e.dataTransfer.getData('text/plain'));
+                        let to = parseInt(div.dataset.idx);
+                        if (from !== to) { let moved = steps.splice(from,1)[0]; steps.splice(to,0,moved); renderSeq(); }
+                    });
+                    container.appendChild(div);
                 });
             }
-
-            drags.forEach(d => makeDraggable(d));
-
-            zones.forEach(z => {
-                z.addEventListener('dragover', e => { e.preventDefault(); z.classList.add('active-drop'); });
-                z.addEventListener('dragleave', () => z.classList.remove('active-drop'));
-                z.addEventListener('drop', e => {
-                    e.preventDefault();
-                    z.classList.remove('active-drop');
-                    const data = e.dataTransfer.getData('text/plain');
-                    if (!data) return;
-                    const [correctVal, text] = data.split('|');
-                    const accept = z.dataset.accept;
-                    if ((accept === 'true' && correctVal === 'true') || (accept === 'false' && correctVal === 'false') ||
-                        (accept === 'for' && correctVal === 'for') || (accept === 'while' && correctVal === 'while')) {
-                        const container = z.querySelector('.dropped-items');
-                        const draggedEl = Array.from(document.querySelectorAll('.draggable')).find(el => el.textContent === text);
-                        if (draggedEl && draggedEl.closest('.drag-container')) {
-                            draggedEl.remove();
-                            const newEl = document.createElement('div');
-                            newEl.className = 'dropped-item';
-                            newEl.textContent = text;
-                            newEl.dataset.correct = correctVal;
-                            newEl.setAttribute('draggable', 'true');
-                            newEl.addEventListener('dragstart', e2 => {
-                                e2.dataTransfer.setData('text/plain', correctVal + '|' + text);
-                            });
-                            container.appendChild(newEl);
-                        }
-                    } else {
-                        feedbackMsg.innerHTML = '❌ Этот блок не подходит для выбранной зоны. Вспомните материал о зацикливании (страница 13).';
-                    }
-                });
-            });
-
-            document.addEventListener('dragover', e => e.preventDefault());
-            document.addEventListener('drop', e => {
-                const dragContainer = document.querySelector('.drag-container');
-                if (dragContainer && e.target.closest('.drag-container')) {
-                    e.preventDefault();
-                    const data = e.dataTransfer.getData('text/plain');
-                    if (!data) return;
-                    const [correctVal, text] = data.split('|');
-                    const droppedItem = Array.from(document.querySelectorAll('.dropped-item')).find(el => el.textContent === text);
-                    if (droppedItem) {
-                        droppedItem.remove();
-                        const newDrag = document.createElement('div');
-                        newDrag.className = 'draggable';
-                        newDrag.textContent = text;
-                        newDrag.dataset.correct = correctVal;
-                        newDrag.setAttribute('draggable', 'true');
-                        makeDraggable(newDrag);
-                        dragContainer.appendChild(newDrag);
-                    }
+            renderSeq();
+            let checkSeqBtn = document.createElement('button'); 
+            checkSeqBtn.innerText = "🔁 ПРОВЕРИТЬ ПОРЯДОК"; 
+            checkSeqBtn.className = "btn btn-small"; 
+            checkSeqBtn.style.marginTop = "20px";
+            checkSeqBtn.addEventListener('click', () => {
+                if (isAnswered) return;
+                let ok = true;
+                for (let i=0; i<steps.length; i++) {
+                    if (steps[i] !== currentTask.steps[currentTask.correctOrder[i]]) ok = false;
                 }
+                completeTask(ok);
             });
-
-            checkBtn.addEventListener('click', () => {
-                const leftDrags = document.querySelectorAll('.drag-container .draggable').length;
-                if (leftDrags === 0) {
-                    handleTaskComplete(true);
-                } else {
-                    feedbackMsg.innerHTML = '⚠️ Распределите все блоки по соответствующим зонам. Если ошиблись — перетащите блок обратно в верхнюю область.';
-                }
-            });
+            taskArea.appendChild(checkSeqBtn);
         }
-
-        // ---------- SEQUENCE (С ОТМЕНОЙ ПО КЛИКУ НА СЛОТ) ----------
-        function setupSequence(task) {
-            const choices = document.querySelectorAll('.choice-btn');
-            const slots = document.querySelectorAll('.seq-slot');
-            const checkBtn = document.getElementById('checkSeqBtn');
-            let selectedIndices = [];
-
-            choices.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    if (btn.classList.contains('selected')) return;
-                    const idx = parseInt(btn.dataset.seqindex);
-                    if (selectedIndices.length < task.items.length) {
-                        btn.classList.add('selected');
-                        selectedIndices.push(idx);
-                        const slot = slots[selectedIndices.length-1];
-                        slot.textContent = task.items[idx];
-                        slot.classList.add('filled');
-                        slot.dataset.selectedIndex = idx;
-                    }
-                });
-            });
-
-            slots.forEach((slot, i) => {
-                slot.addEventListener('click', () => {
-                    if (!slot.classList.contains('filled')) return;
-                    const idxToRemove = slot.dataset.selectedIndex;
-                    slot.textContent = i+1;
-                    slot.classList.remove('filled');
-                    delete slot.dataset.selectedIndex;
-                    
-                    const choiceToEnable = Array.from(choices).find(c => parseInt(c.dataset.seqindex) === parseInt(idxToRemove));
-                    if (choiceToEnable) choiceToEnable.classList.remove('selected');
-                    
-                    selectedIndices = selectedIndices.filter(v => v != idxToRemove);
-                    
-                    for (let j = i; j < slots.length-1; j++) {
-                        const nextSlot = slots[j+1];
-                        if (nextSlot.classList.contains('filled')) {
-                            slots[j].textContent = nextSlot.textContent;
-                            slots[j].classList.add('filled');
-                            slots[j].dataset.selectedIndex = nextSlot.dataset.selectedIndex;
-                        } else {
-                            slots[j].textContent = j+1;
-                            slots[j].classList.remove('filled');
-                            delete slots[j].dataset.selectedIndex;
-                            break;
-                        }
-                    }
-                    const lastSlot = slots[slots.length-1];
-                    if (!slots[slots.length-2]?.classList.contains('filled')) {
-                        lastSlot.textContent = slots.length;
-                        lastSlot.classList.remove('filled');
-                        delete lastSlot.dataset.selectedIndex;
-                    }
-                    
-                    selectedIndices = [];
-                    slots.forEach(s => { if(s.classList.contains('filled')) selectedIndices.push(parseInt(s.dataset.selectedIndex)); });
-                });
-            });
-
-            checkBtn.addEventListener('click', () => {
-                if (selectedIndices.length !== task.solutionOrder.length) {
-                    feedbackMsg.innerHTML = '⚠️ Выберите все шаги последовательности. Кликните на слот, чтобы отменить выбор и изменить порядок.';
-                    return;
-                }
-                let correct = true;
-                for (let i=0; i<task.solutionOrder.length; i++) {
-                    if (selectedIndices[i] !== task.solutionOrder[i]) { correct = false; break; }
-                }
-                if (correct) {
-                    handleTaskComplete(true);
-                } else {
-                    feedbackMsg.innerHTML = '❌ Порядок шагов неверный. Вспомните алгоритм со страниц 16-17 учебника. Кликните на слот для сброса.';
-                }
-            });
-        }
-
-        // ---------- СБРОС ТЕКУЩЕГО ЗАДАНИЯ ----------
-        function resetCurrentTask() {
-            if (taskCompleted) {
-                feedbackMsg.innerHTML = '✅ Задание уже выполнено! Нажмите кнопку «ПЕРЕЙТИ К СЛЕДУЮЩЕМУ ЗАДАНИЮ».';
-                return;
-            }
-            renderTask(currentTaskIndex);
-            feedbackMsg.innerHTML = '🔄 Задание сброшено. Попробуйте выполнить его снова, внимательно читая подсказки.';
-        }
-
-        // ---------- ОБРАБОТЧИКИ СОБЫТИЙ ----------
-        startBtn.addEventListener('click', resetGame);
-        nextBtn.addEventListener('click', goToNextTask);
-        resetTaskBtn.addEventListener('click', resetCurrentTask);
-        
-        restartBtn.addEventListener('click', () => {
-            resetGame();
-        });
-        
-        backToStartBtn.addEventListener('click', () => {
-            showScreen('startScreen');
-        });
-
         updateProgress();
-    })();
+    }
+
+    function nextTask() {
+        if (!isAnswered) { feedbackDiv.innerHTML = "⚠️ Сначала выполните задание!"; return; }
+        if (currentTaskIdx + 1 < TASKS.length) {
+            currentTaskIdx++; isAnswered = false; nextBtn.disabled = true; renderTask();
+            feedbackDiv.innerHTML = "⚡ Новое задание.";
+            setLedColor(null);
+        } else { 
+            finalSpan.innerText = totalCorrect; 
+            gameScreen.classList.remove('active'); 
+            finalScreen.classList.add('active'); 
+            document.getElementById('mainTitle').innerHTML = "ДРЕВНИЙ ЦИФРОВОЙ АРХИВ · ДОСТУП ОТКРЫТ";
+        }
+    }
+
+    function resetCurrent() { if (!isAnswered) renderTask(); else feedbackDiv.innerHTML = "Задание завершено, идите дальше."; }
+    function startVerification() { 
+        studentSkill = 5; totalCorrect = 0; currentTaskIdx = 0; isAnswered = false; 
+        correctSpan.innerText = "0"; nextBtn.disabled = true; 
+        startScreen.classList.remove('active'); gameScreen.classList.add('active'); finalScreen.classList.remove('active'); 
+        renderTask(); 
+        feedbackDiv.innerHTML = "🔐 Начинаем верификацию.";
+        setLedColor(null); 
+        document.getElementById('mainTitle').innerHTML = "ДРЕВНИЙ ЦИФРОВОЙ АРХИВ";
+    }
+    function returnToArchive() { startScreen.classList.add('active'); gameScreen.classList.remove('active'); finalScreen.classList.remove('active'); setLedColor(null); }
+
+    startBtn.addEventListener('click', startVerification);
+    nextBtn.addEventListener('click', nextTask);
+    resetBtn.addEventListener('click', resetCurrent);
+    returnBtn.addEventListener('click', returnToArchive);
+    setLedColor(null);
 </script>
 </body>
 </html>
